@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eXview AIO (RK3588.M1) — Android Firmware Flashing SOP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <header>
+    <div class="badge">Standard Operating Procedure</div>
+    <h1>3rd Generation AIO (RK3588.M1)<br>Android Firmware Flashing via Type-C Cable</h1>
+    <p class="subtitle">Step-by-step guide for flashing Android firmware using RKDevTool on Windows</p>
+    <div class="meta">
+      <span>🔧 Platform: Rockchip RK3588</span>
+      <span>💻 OS: Windows 10 / 11</span>
+      <span>🔌 Connection: USB-A to Type-C</span>
+      <span>📦 Tool: RKDevTool v3.18</span>
+    </div>
+  </header>
+
+  <!-- ══ SIDEBAR NAV ══════════════════════════════════════════ -->
+  <nav class="sidebar">
+    <div class="nav-title">Contents</div>
+    <a href="#section-tools"><span class="nav-num">1</span>Required Tools</a>
+    <a href="#section-board"><span class="nav-num">2</span>Board Overview</a>
+    <a href="#section-driver"><span class="nav-num">3</span>Install USB Driver</a>
+    <a href="#section-tool"><span class="nav-num">4</span>Open Flashing Tool</a>
+    <a href="#section-recovery"><span class="nav-num">5</span>Enter Recovery Mode</a>
+    <a href="#section-flash"><span class="nav-num">6</span>Flash the Firmware</a>
+    <a href="#section-verify"><span class="nav-num">7</span>Verify &amp; Factory Reset</a>
+    <a href="#section-trouble"><span class="nav-num">!</span>Troubleshooting</a>
+  </nav>
+
+  <!-- ══ MAIN CONTENT ═════════════════════════════════════════ -->
+  <main>
+
+    <!-- ── SECTION 1: Tools ─────────────────────────────────── -->
+    <section class="section" id="section-tools">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Required Tools</h2>
+      </div>
+
+      <p>Confirm you have all four items below before starting. The flashing process cannot be completed without any one of them.</p>
+
+      <div class="tools-grid">
+        <div class="tool-card">
+          <img src="images/cable.png" alt="USB-A to Type-C cable" />
+          <div class="tool-name">USB-A to Type-C Cable</div>
+          <div class="tool-desc">Must be a data cable — charge-only cables will not work</div>
+        </div>
+        <div class="tool-card">
+          <img src="images/firmware-file.png" alt="Firmware file" />
+          <div class="tool-name">Firmware File</div>
+          <div class="tool-desc"><code>allupgrade_3588_64G_8G</code><br>(.img format)</div>
+        </div>
+        <div class="tool-card">
+          <img src="images/driver-folder.png" alt="DriverAssistant folder" />
+          <div class="tool-name">USB Driver Package</div>
+          <div class="tool-desc"><code>DriverAssistant_v5.1.1</code> folder</div>
+        </div>
+        <div class="tool-card">
+          <img src="images/tool-folder.png" alt="RKDevTool folder" />
+          <div class="tool-name">Flashing Tool</div>
+          <div class="tool-desc"><code>RKDevTool_Release_v3.18</code> folder</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: Board Overview ────────────────────────── -->
+    <section class="section" id="section-board">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Board Overview — Connectors and Buttons</h2>
+      </div>
+
+      <p>Before connecting anything, locate these two points on the Android board. You will need both during the flashing process.</p>
+
+      <div class="img-row">
+        <figure>
+          <img src="images/board-typec-port.png" alt="Type-C port location on board" />
+          <figcaption><strong>TYPE-C port</strong> — connect your cable here to link the board to your PC</figcaption>
+        </figure>
+        <figure>
+          <img src="images/board-recovery-button.png" alt="Recovery button location on board" />
+          <figcaption><strong>RECOVERY button</strong> — small push button near the HDMI OUT connector, used to enter flash mode</figcaption>
+        </figure>
+      </div>
+
+      <div class="img-wrap">
+        <img src="images/board-overview.png" alt="Full board overview with TYPEC and RECOVERY labeled" class="lg" />
+        <figcaption>Full board view — both the TYPE-C port and RECOVERY button are labeled</figcaption>
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">Note</div>
+        Keep this view handy. You will need to press the RECOVERY button precisely in Step 5 while reconnecting power.
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: Install Driver ────────────────────────── -->
+    <section class="section" id="section-driver">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Install the USB Driver</h2>
+      </div>
+
+      <p>The Rockchip USB driver must be installed on your PC before the flashing tool can communicate with the board. This is a one-time setup step — skip it if the driver is already installed.</p>
+
+      <ol class="steps">
+        <li>
+          Open the <code>DriverAssistant_v5.1.1</code> folder.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/driver-install-file.png" alt="DriverAssistant folder contents with DriverInstall highlighted" class="md" />
+            <figcaption>Double-click <strong>DriverInstall</strong> (highlighted in red)</figcaption>
+          </div>
+        </li>
+        <li>
+          The <strong>Rockchip Driver Assistant v5.1.1</strong> window will open.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/driver-install-ui.png" alt="Rockchip Driver Assistant UI" class="md" />
+            <figcaption>Click <strong>Drive Installation</strong> (left button)</figcaption>
+          </div>
+        </li>
+        <li>Click <strong>Drive Installation</strong> and wait for the process to complete. The progress bar will fill when done.</li>
+      </ol>
+
+      <div class="callout warn">
+        <div class="callout-title">If you have a previous version installed</div>
+        Click <strong>Driver Uninstallation</strong> first to remove the old driver, then click <strong>Drive Installation</strong> to install the current version. Mixing driver versions can prevent device detection.
+      </div>
+    </section>
+
+    <!-- ── SECTION 4: Open Flashing Tool ────────────────────── -->
+    <section class="section" id="section-tool">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Open the Flashing Tool</h2>
+      </div>
+
+      <ol class="steps">
+        <li>
+          Open the <code>RKDevTool_Release_v3.18</code> folder.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/rkdevtool-file.png" alt="RKDevTool folder contents" class="md" />
+            <figcaption>Double-click <strong>RKDevTool</strong> (highlighted in red)</figcaption>
+          </div>
+        </li>
+        <li>
+          The RKDevTool window will open. The status bar at the bottom will display <strong>"No Devices Found"</strong> — this is normal at this stage.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/rkdevtool-no-device.png" alt="RKDevTool showing No Devices Found" class="lg" />
+            <figcaption>"No Devices Found" is expected — the tool is open and waiting for the board</figcaption>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout note">
+        <div class="callout-title">Leave this window open</div>
+        Keep RKDevTool running throughout the rest of the procedure. You will watch it detect the board in the next step.
+      </div>
+    </section>
+
+    <!-- ── SECTION 5: Recovery Mode ─────────────────────────── -->
+    <section class="section" id="section-recovery">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Put the Board into Recovery (Flash) Mode</h2>
+      </div>
+
+      <p>This is the most critical step. The sequence of power-off, button-hold, and power-on must be performed in the correct order.</p>
+
+      <ol class="steps">
+        <li><strong>Disconnect power</strong> from the Android board completely.</li>
+        <li>Connect the Type-C cable from the board's <strong>TYPE-C port</strong> to your PC.</li>
+        <li><strong>Press and hold the RECOVERY button</strong> — keep it held down without releasing.</li>
+        <li>While still holding RECOVERY, <strong>reconnect power</strong> to the board.</li>
+        <li>Continue holding for approximately <strong>3–5 seconds</strong>, then release the button.</li>
+        <li>
+          Watch the RKDevTool status bar — it should change to <strong>"Found One LOADER Device"</strong>.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/rkdevtool-found-device.png" alt="RKDevTool showing Found One LOADER Device" class="lg" />
+            <figcaption><strong>"Found One LOADER Device"</strong> confirms the board is ready to be flashed</figcaption>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout warn">
+        <div class="callout-title">Device not detected? Try rotating the cable</div>
+        <p>The Type-C connector is physically reversible but Rockchip boards can be directionally sensitive. If the device is not detected:</p>
+        <ol style="margin-top:8px; padding-left:20px;">
+          <li>Disconnect power and the Type-C cable.</li>
+          <li>Rotate the Type-C connector <strong>180°</strong> and plug it back in.</li>
+          <li>Repeat the recovery sequence from Step 1.</li>
+        </ol>
+        <div class="img-wrap" style="margin-top:12px;">
+          <img src="images/cable-rotate.png" alt="Rotating the Type-C cable 180 degrees" class="md" />
+          <figcaption>Flip the Type-C end 180° if the device is not detected</figcaption>
+        </div>
+        <p style="margin-top:8px;">If still not detected after rotating, uninstall and reinstall the driver (Section 3), then try again.</p>
+      </div>
+    </section>
+
+    <!-- ── SECTION 6: Flash Firmware ────────────────────────── -->
+    <section class="section" id="section-flash">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Load and Flash the Firmware</h2>
+      </div>
+
+      <p>With <strong>"Found One LOADER Device"</strong> confirmed, follow these steps in RKDevTool. The diagram below shows the numbered click order.</p>
+
+      <div class="img-wrap">
+        <img src="images/rkdevtool-firmware-steps.png" alt="RKDevTool Upgrade Firmware screen with numbered steps" class="lg" />
+        <figcaption>Follow the numbered steps 1 → 2 → 3 → 4 in order</figcaption>
+      </div>
+
+      <ol class="steps">
+        <li><strong>① Click "Upgrade Firmware"</strong> tab at the top of the RKDevTool window.</li>
+        <li><strong>② Click the "Firmware" button.</strong> A file browser will open.</li>
+        <li><strong>③ Select the firmware file</strong> — navigate to and open <code>allupgrade_3588_64G_8G</code>. The file path will appear in the Firmware field, confirming it is loaded.</li>
+        <li><strong>④ Click "Upgrade"</strong> to begin flashing.</li>
+      </ol>
+
+      <p>The log panel on the right will show progress. A successful flash produces this sequence:</p>
+
+      <div class="log-block">
+        <span class="log-muted">Test Device Start</span><br>
+        <span class="log-muted">Test Device Success</span><br>
+        <span class="log-muted">Check Chip Start</span><br>
+        <span class="log-muted">Check Chip Success</span><br>
+        <span class="log-muted">Get FlashInfo Start</span><br>
+        <span class="log-muted">Get FlashInfo Success</span><br>
+        <span class="log-muted">Prepare IDB Start</span><br>
+        <span class="log-muted">Prepare IDB Success</span><br>
+        <span class="log-muted">Download IDB Start</span><br>
+        <span class="log-muted">Download IDB Success</span><br>
+        <span class="log-muted">Download Firmware Start</span><br>
+        <span class="log-muted">Download Firmware (100%)...</span><br>
+        <span class="log-ok">Download Firmware Success ✓</span>
+      </div>
+
+      <div class="img-wrap">
+        <img src="images/rkdevtool-success.png" alt="RKDevTool log showing Download Firmware Success" class="lg" />
+        <figcaption>Wait for <strong>"Download Firmware Success"</strong> — the board will then reboot automatically</figcaption>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">Do not interrupt the flashing process</div>
+        Do not disconnect the USB cable or remove power while the firmware is downloading. Interrupting the flash can leave the board in an unbootable state.
+      </div>
+    </section>
+
+    <!-- ── SECTION 7: Verify & Factory Reset ────────────────── -->
+    <section class="section" id="section-verify">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>Verify Boot and Perform Factory Reset</h2>
+      </div>
+
+      <p>After the flash completes, the board reboots automatically into Android. A factory reset is required to clear any leftover data from the previous firmware.</p>
+
+      <ol class="steps">
+        <li>
+          Wait for the board to finish booting. The Android home screen should appear.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/android-boot.png" alt="Android home screen after successful boot" class="md" />
+            <figcaption>Successful boot — Android home screen is visible</figcaption>
+          </div>
+        </li>
+        <li>On the Android device, navigate to <strong>Settings → System → Factory Reset</strong>.</li>
+        <li>
+          Review the warning dialog and tap <strong>Confirm</strong>.
+          <div class="img-wrap" style="margin-top:12px;">
+            <img src="images/factory-reset.png" alt="Android Factory Reset confirmation dialog" class="md" />
+            <figcaption>Tap <strong>Confirm</strong> to complete the factory reset</figcaption>
+          </div>
+        </li>
+        <li>Wait for the device to reset and reboot. The process is complete.</li>
+      </ol>
+
+      <div class="callout ok">
+        <div class="callout-title">Flashing complete</div>
+        The board is now running the new firmware with a clean factory state. It is ready for configuration.
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">Why factory reset is required</div>
+        A firmware flash replaces the system partition but does not automatically wipe user data. Leftover settings and cached data from the previous firmware version can cause unexpected behaviour, so a factory reset is always required after flashing.
+      </div>
+    </section>
+
+    <!-- ── SECTION: Troubleshooting ─────────────────────────── -->
+    <section class="section" id="section-trouble">
+      <div class="section-header">
+        <div class="section-number">!</div>
+        <h2>Troubleshooting</h2>
+      </div>
+
+      <table class="trouble-table">
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Solution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"No Devices Found" after entering recovery mode</td>
+            <td>Rotate the Type-C cable connector 180° and retry the recovery sequence (Section 5). This is the most common cause of detection failure.</td>
+          </tr>
+          <tr>
+            <td>Device still not detected after rotating cable</td>
+            <td>Uninstall and reinstall the Rockchip driver via <strong>DriverInstall</strong> (Section 3), then retry the full recovery sequence.</td>
+          </tr>
+          <tr>
+            <td>RKDevTool cannot open the firmware file</td>
+            <td>Confirm the file is the correct <code>.img</code> for this board: <code>allupgrade_3588_64G_8G</code>. Ensure it is not compressed (.zip) — extract it first if needed.</td>
+          </tr>
+          <tr>
+            <td>Flash fails or stops partway through</td>
+            <td>Check that the USB cable is firmly connected at both ends. Close RKDevTool, repeat the recovery entry sequence (Section 5), then start the upgrade again (Section 6).</td>
+          </tr>
+          <tr>
+            <td>Board does not boot after flashing</td>
+            <td>Repeat the entire procedure from Section 5. If the board remains unresponsive, confirm the firmware file matches the board model (64G storage, 8G RAM variant).</td>
+          </tr>
+          <tr>
+            <td>Android boots but behaves unexpectedly</td>
+            <td>Ensure the factory reset (Section 7) was completed. Old cached data from a previous firmware version is the most common cause of post-flash issues.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+  <footer>
+    <span>3rd Generation AIO (RK3588.M1) — Firmware Flashing SOP</span>
+    <span>Tool: RKDevTool v3.18 &nbsp;·&nbsp; Driver: DriverAssistant v5.1.1 &nbsp;·&nbsp; Chip: Rockchip RK3588</span>
+  </footer>
+
+</div><!-- .page-wrap -->
+
+<!-- ── Sidebar active link highlight on scroll ──────────────── -->
+<script>
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('nav.sidebar a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const id = entry.target.id;
+        const active = document.querySelector(`nav.sidebar a[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
